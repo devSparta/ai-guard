@@ -1,0 +1,240 @@
+openapi: 3.0.3
+info:
+  title: AI Guard API
+  version: 1.0.0
+servers:
+  - url: /api/v1
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /me:
+    get:
+      tags: [Auth]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /chat/sessions:
+    get:
+      tags: [Chat]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Chat sessions
+    post:
+      tags: [Chat]
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Session created
+
+  /chat/sessions/{session_id}/messages:
+    post:
+      tags: [Chat]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '200':
+          description: Message processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResponse'
+
+  /security/events:
+    get:
+      tags: [Security]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Security events
+
+  /security/stats:
+    get:
+      tags: [Security]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dashboard statistics
+
+  /documents:
+    get:
+      tags: [Documents]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Documents
+    post:
+      tags: [Documents]
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Document uploaded
+
+  /approvals:
+    get:
+      tags: [Approvals]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Approval requests
+
+  /approvals/{approval_id}/decision:
+    post:
+      tags: [Approvals]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: approval_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Approval decision saved
+
+  /simulator/attacks:
+    post:
+      tags: [Simulator]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Attack simulation completed
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [access_token, refresh_token, user]
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      required: [id, email, roles]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        roles:
+          type: array
+          items:
+            type: string
+            enum: [USER, SECURITY_ANALYST, ADMIN]
+
+    SendMessageRequest:
+      type: object
+      required: [client_message_id, content]
+      properties:
+        client_message_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+          minLength: 1
+        document_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    SendMessageResponse:
+      type: object
+      required: [security]
+      properties:
+        message:
+          nullable: true
+          type: object
+        security:
+          $ref: '#/components/schemas/SecuritySummary'
+        pending_approval:
+          nullable: true
+          type: object
+
+    SecuritySummary:
+      type: object
+      required: [risk_score, severity, decision, reason_codes]
+      properties:
+        risk_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        severity:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+        decision:
+          type: string
+          enum: [ALLOW, ALLOW_WITH_MASKING, REQUIRE_CONFIRMATION, REVIEW, BLOCK]
+        reason_codes:
+          type: array
+          items:
+            type: string

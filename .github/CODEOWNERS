@@ -1,0 +1,36 @@
+# AI Guard CODEOWNERS
+#
+# GitHub автоматически запросит review у владельца,
+# когда Pull Request затрагивает указанные пути.
+
+# Student 1 — Backend / Architecture / DB
+/backend/internal/app/          @devSparta
+/backend/internal/config/       @devSparta
+/backend/internal/domain/       @devSparta
+/backend/internal/httpapi/      @devSparta
+/backend/internal/auth/         @devSparta
+/backend/internal/users/        @devSparta
+/backend/internal/chat/         @devSparta
+/backend/internal/documents/    @devSparta
+/backend/internal/database/     @devSparta
+/backend/internal/events/       @devSparta
+/backend/internal/audit/        @devSparta
+/backend/internal/approvals/    @devSparta
+/backend/migrations/            @devSparta
+
+# Student 2 — Security Engine
+/backend/internal/security/     @ak0telnikov
+
+# Student 3 — Frontend
+/frontend/                      @Samore
+
+# Student 4 — LLM / Agent / Tools / DevOps
+/backend/internal/llm/          @danikeyskiy
+/backend/internal/agent/        @danikeyskiy
+/backend/internal/tools/        @danikeyskiy
+/infra/                         @danikeyskiy
+/.github/workflows/             @danikeyskiy
+
+# Contracts / API
+/docs/contracts/                @devSparta
+/docs/spec/                     @devSparta
